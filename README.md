@@ -10,8 +10,8 @@
 ### Clone the repository
 
 ```bash
-git clone https://github.com/sebdanielsson/repo-name.git
-cd repo-name
+git clone https://github.com/sebdanielsson/gik2nv-lab4-neo4j.git
+cd gik2nv-lab4-neo4j
 ```
 
 ## Usage
