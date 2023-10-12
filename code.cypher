@@ -48,65 +48,87 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
        (u4:User {userID: 4, name: 'Elon', birthYear: 1971, gender: 'Male'});
 
 // WRITTEN_BY relationships
-MATCH (b1:Book {title: 'Murder on the Orient Express'}), (a1:Author {name: 'Dame Agatha Christie'})
+MATCH (b1:Book {title: 'Murder on the Orient Express'})
+MATCH (a1:Author {name: 'Dame Agatha Christie'})
 MERGE (b1)-[:WRITTEN_BY]->(a1);
 
-MATCH (b2:Book {title: '1984'}), (a2:Author {name: 'George Orwell'})
+MATCH (b2:Book {title: '1984'})
+MATCH (a2:Author {name: 'George Orwell'})
 MERGE (b2)-[:WRITTEN_BY]->(a2);
 
-MATCH (b3:Book {title: 'The Great Gatsby'}), (a4:Author {name: 'F. Scott Fitzgerald'})
+MATCH (b3:Book {title: 'The Great Gatsby'})
+MATCH (a4:Author {name: 'F. Scott Fitzgerald'})
 MERGE (b3)-[:WRITTEN_BY]->(a4);
 
-MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'}), (a3:Author {name: 'J. K. Rowling'})
+MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MATCH (a3:Author {name: 'J. K. Rowling'})
 MERGE (b4)-[:WRITTEN_BY]->(a3);
 
 // BELONGS_TO relationships
-MATCH (b1:Book {title: 'Murder on the Orient Express'}), (g1:Genre {genreName: 'Crime'})
+MATCH (b1:Book {title: 'Murder on the Orient Express'})
+MATCH (g1:Genre {genreName: 'Crime'})
 MERGE (b1)-[:BELONGS_TO]->(g1);
 
-MATCH (b2:Book {title: '1984'}), (g2:Genre {genreName: 'Dystopian'})
+MATCH (b2:Book {title: '1984'})
+MATCH (g2:Genre {genreName: 'Dystopian'})
 MERGE (b2)-[:BELONGS_TO]->(g2);
 
-MATCH (b3:Book {title: 'The Great Gatsby'}), (g4:Genre {genreName: 'Tragedy'})
+MATCH (b3:Book {title: 'The Great Gatsby'})
+MATCH (g4:Genre {genreName: 'Tragedy'})
 MERGE (b3)-[:BELONGS_TO]->(g4);
 
-MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'}), (g3:Genre {genreName: 'Fantasy'})
+MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MATCH (g3:Genre {genreName: 'Fantasy'})
 MERGE (b4)-[:BELONGS_TO]->(g3);
 
 // READ relationships
-MATCH (u1:User {name: 'Sebastian'}), (b1:Book {title: 'Murder on the Orient Express'})
+MATCH (u1:User {name: 'Sebastian'})
+MATCH (b1:Book {title: 'Murder on the Orient Express'})
 MERGE (u1)-[:READ {dateRead: date('2023-03-10'), rating: 2}]->(b1);
 
-MATCH (u1:User {name: 'Sebastian'}), (b2:Book {title: '1984'})
+MATCH (u1:User {name: 'Sebastian'})
+MATCH (b2:Book {title: '1984'})
 MERGE (u1)-[:READ {dateRead: date('2023-08-01'), rating: 5}]->(b2);
 
-MATCH (u2:User {name: 'Veronika'}), (b3:Book {title: 'The Great Gatsby'})
+MATCH (u2:User {name: 'Veronika'})
+MATCH (b3:Book {title: 'The Great Gatsby'})
 MERGE (u2)-[:READ {dateRead: date('2023-07-10'), rating: 3}]->(b3);
 
-MATCH (u2:User {name: 'Veronika'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MATCH (u2:User {name: 'Veronika'})
+MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
 MERGE (u2)-[:READ {dateRead: date('2023-05-23'), rating: 1}]->(b4);
 
-MATCH (u3:User {name: 'Jesper'}), (b1:Book {title: 'Murder on the Orient Express'})
+MATCH (u3:User {name: 'Jesper'})
+MATCH (b1:Book {title: 'Murder on the Orient Express'})
 MERGE (u3)-[:READ {dateRead: date('2023-12-20'), rating: 5}]->(b1);
 
-MATCH (u3:User {name: 'Jesper'}), (b3:Book {title: 'The Great Gatsby'})
+MATCH (u3:User {name: 'Jesper'})
+MATCH (b3:Book {title: 'The Great Gatsby'})
 MERGE (u3)-[:READ {dateRead: date('2023-09-14'), rating: 4}]->(b3);
 
-MATCH (u4:User {name: 'Elon'}), (b2:Book {title: '1984'})
+MATCH (u4:User {name: 'Elon'})
+MATCH (b2:Book {title: '1984'})
 MERGE (u4)-[:READ {dateRead: date('2023-01-29'), rating: 5}]->(b2);
 
-MATCH (u4:User {name: 'Elon'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MATCH (u4:User {name: 'Elon'})
+MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
 MERGE (u4)-[:READ {dateRead: date('2023-10-10'), rating: 4}]->(b4);
 
 // FRIENDS_WITH relationships
-MATCH (u1:User {name: 'Sebastian'}), (u2:User {name: 'Veronika'}), (u3:User {name: 'Jesper'})
-MERGE (u1)-[:FRIENDS_WITH]->(u2)
+MATCH (u1:User {name: 'Sebastian'})
+MATCH (u2:User {name: 'Veronika'})
+MERGE (u1)-[:FRIENDS_WITH]->(u2);
+
+MATCH (u1:User {name: 'Sebastian'})
+MATCH (u3:User {name: 'Jesper'})
 MERGE (u1)-[:FRIENDS_WITH]->(u3);
 
-MATCH (u2:User {name: 'Veronika'}), (u4:User {name: 'Elon'})
+MATCH (u2:User {name: 'Veronika'})
+MATCH (u4:User {name: 'Elon'})
 MERGE (u2)-[:FRIENDS_WITH]->(u4);
 
-MATCH (u3:User {name: 'Jesper'}), (u4:User {name: 'Elon'})
+MATCH (u3:User {name: 'Jesper'})
+MATCH (u4:User {name: 'Elon'})
 MERGE (u3)-[:FRIENDS_WITH]->(u4);
 
 // Show all nodes and relationships
