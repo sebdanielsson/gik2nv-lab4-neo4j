@@ -11,6 +11,15 @@ FOR (genre:Genre) REQUIRE genre.genreID IS UNIQUE;
 CREATE CONSTRAINT user_id_unique IF NOT EXISTS
 FOR (user:User) REQUIRE user.userID IS UNIQUE;
 
+// Require a rating and date for finish reading the book. (Requires enterprise edition)
+CREATE CONSTRAINT read_date_exists IF NOT EXISTS
+FOR ()-[r:READ]-()
+REQUIRE r.dateRead IS NOT NULL;
+
+CREATE CONSTRAINT rating_exists IF NOT EXISTS
+FOR ()-[r:READ]-()
+REQUIRE r.rating IS NOT NULL;
+
 // Create Author nodes
 CREATE
        (a1:Author {authorID: 1, name: 'Dame Agatha Christie', gender: 'Female'}),
@@ -65,21 +74,29 @@ MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'}), (g3:Genre 
 MERGE (b4)-[:BELONGS_TO]->(g3);
 
 // READ relationships
-MATCH (u1:User {name: 'Sebastian'}), (b1:Book {title: 'Murder on the Orient Express'}), (b2:Book {title: '1984'})
-MERGE (u1)-[:READ]->(b1)
-MERGE (u1)-[:READ]->(b2);
+MATCH (u1:User {name: 'Sebastian'}), (b1:Book {title: 'Murder on the Orient Express'})
+MERGE (u1)-[:READ {dateRead: date('2023-03-10'), rating: 2}]->(b1);
 
-MATCH (u2:User {name: 'Veronika'}), (b3:Book {title: 'The Great Gatsby'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
-MERGE (u2)-[:READ]->(b3)
-MERGE (u2)-[:READ]->(b4);
+MATCH (u1:User {name: 'Sebastian'}), (b2:Book {title: '1984'})
+MERGE (u1)-[:READ {dateRead: date('2023-08-01'), rating: 5}]->(b2);
 
-MATCH (u3:User {name: 'Jesper'}), (b1:Book {title: 'Murder on the Orient Express'}), (b3:Book {title: 'The Great Gatsby'})
-MERGE (u3)-[:READ]->(b1)
-MERGE (u3)-[:READ]->(b3);
+MATCH (u2:User {name: 'Veronika'}), (b3:Book {title: 'The Great Gatsby'})
+MERGE (u2)-[:READ {dateRead: date('2023-07-10'), rating: 3}]->(b3);
 
-MATCH (u4:User {name: 'Elon'}), (b2:Book {title: '1984'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
-MERGE (u4)-[:READ]->(b2)
-MERGE (u4)-[:READ]->(b4);
+MATCH (u2:User {name: 'Veronika'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MERGE (u2)-[:READ {dateRead: date('2023-05-23'), rating: 1}]->(b4);
+
+MATCH (u3:User {name: 'Jesper'}), (b1:Book {title: 'Murder on the Orient Express'})
+MERGE (u3)-[:READ {dateRead: date('2023-12-20'), rating: 5}]->(b1);
+
+MATCH (u3:User {name: 'Jesper'}), (b3:Book {title: 'The Great Gatsby'})
+MERGE (u3)-[:READ {dateRead: date('2023-09-14'), rating: 4}]->(b3);
+
+MATCH (u4:User {name: 'Elon'}), (b2:Book {title: '1984'})
+MERGE (u4)-[:READ {dateRead: date('2023-01-29'), rating: 5}]->(b2);
+
+MATCH (u4:User {name: 'Elon'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MERGE (u4)-[:READ {dateRead: date('2023-10-10'), rating: 4}]->(b4);
 
 // FRIENDS_WITH relationships
 MATCH (u1:User {name: 'Sebastian'}), (u2:User {name: 'Veronika'}), (u3:User {name: 'Jesper'})
@@ -94,6 +111,9 @@ MERGE (u3)-[:FRIENDS_WITH]->(u4);
 
 // Show all nodes and relationships
 MATCH (n) RETURN n;
+
+// Show all constraints
+SHOW ALL CONSTRAINTS;
 
 // Delete all nodes and relationships
 // MATCH (n) DETACH DELETE n;

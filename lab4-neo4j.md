@@ -66,7 +66,7 @@ The graph should be able to be able to provide basic stats for a fictional book 
 
 The number of questions that _can_ be answered by just these four nodes and five relationships is _huge_, so we will list some questions that come to mind and pick a few to answer in the queries.
 
-1. Which books have been read by a particular user? (Could be sorted by rating, date read)
+1. Which books have been read by a particular user? (Could be sorted by date read)
 2. Which books have been written by a particular author? (Could be sorted by publication year, rating)
 3. Which authors are trending? (Could be for a certain time period)
 4. Which books are trending among men and women respectively? (Could be for a certain time period)
@@ -123,6 +123,15 @@ FOR (genre:Genre) REQUIRE genre.genreID IS UNIQUE;
 
 CREATE CONSTRAINT user_id_unique IF NOT EXISTS
 FOR (user:User) REQUIRE user.userID IS UNIQUE;
+
+// Require a rating and date for finish reading the book. (Requires enterprise edition)
+CREATE CONSTRAINT read_date_exists IF NOT EXISTS
+FOR ()-[r:READ]-()
+REQUIRE r.dateRead IS NOT NULL;
+
+CREATE CONSTRAINT rating_exists IF NOT EXISTS
+FOR ()-[r:READ]-()
+REQUIRE r.rating IS NOT NULL;
 ```
 
 We then proceed to create the labels.
@@ -186,21 +195,29 @@ MATCH (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'}), (g3:Genre 
 MERGE (b4)-[:BELONGS_TO]->(g3);
 
 // READ relationships
-MATCH (u1:User {name: 'Sebastian'}), (b1:Book {title: 'Murder on the Orient Express'}), (b2:Book {title: '1984'})
-MERGE (u1)-[:READ]->(b1)
-MERGE (u1)-[:READ]->(b2);
+MATCH (u1:User {name: 'Sebastian'}), (b1:Book {title: 'Murder on the Orient Express'})
+MERGE (u1)-[:READ {dateRead: date('2023-03-10'), rating: 2}]->(b1);
 
-MATCH (u2:User {name: 'Veronika'}), (b3:Book {title: 'The Great Gatsby'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
-MERGE (u2)-[:READ]->(b3)
-MERGE (u2)-[:READ]->(b4);
+MATCH (u1:User {name: 'Sebastian'}), (b2:Book {title: '1984'})
+MERGE (u1)-[:READ {dateRead: date('2023-08-01'), rating: 5}]->(b2);
 
-MATCH (u3:User {name: 'Jesper'}), (b1:Book {title: 'Murder on the Orient Express'}), (b3:Book {title: 'The Great Gatsby'})
-MERGE (u3)-[:READ]->(b1)
-MERGE (u3)-[:READ]->(b3);
+MATCH (u2:User {name: 'Veronika'}), (b3:Book {title: 'The Great Gatsby'})
+MERGE (u2)-[:READ {dateRead: date('2023-07-10'), rating: 3}]->(b3);
 
-MATCH (u4:User {name: 'Elon'}), (b2:Book {title: '1984'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
-MERGE (u4)-[:READ]->(b2)
-MERGE (u4)-[:READ]->(b4);
+MATCH (u2:User {name: 'Veronika'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MERGE (u2)-[:READ {dateRead: date('2023-05-23'), rating: 1}]->(b4);
+
+MATCH (u3:User {name: 'Jesper'}), (b1:Book {title: 'Murder on the Orient Express'})
+MERGE (u3)-[:READ {dateRead: date('2023-12-20'), rating: 5}]->(b1);
+
+MATCH (u3:User {name: 'Jesper'}), (b3:Book {title: 'The Great Gatsby'})
+MERGE (u3)-[:READ {dateRead: date('2023-09-14'), rating: 4}]->(b3);
+
+MATCH (u4:User {name: 'Elon'}), (b2:Book {title: '1984'})
+MERGE (u4)-[:READ {dateRead: date('2023-01-29'), rating: 5}]->(b2);
+
+MATCH (u4:User {name: 'Elon'}), (b4:Book {title: 'Harry Potter and the Philosopher\'s Stone'})
+MERGE (u4)-[:READ {dateRead: date('2023-10-10'), rating: 4}]->(b4);
 
 // FRIENDS_WITH relationships
 MATCH (u1:User {name: 'Sebastian'}), (u2:User {name: 'Veronika'}), (u3:User {name: 'Jesper'})
@@ -214,11 +231,34 @@ MATCH (u3:User {name: 'Jesper'}), (u4:User {name: 'Elon'})
 MERGE (u3)-[:FRIENDS_WITH]->(u4);
 ```
 
+### Querying the graph
+
+```cypher
+MATCH (u:User)-[r:READ]->(b:Book)-[s:BELONGS_TO]->(g:Genre)
+WHERE u.userID = 1
+RETURN g.genreName, COUNT(b) AS numBooks
+ORDER BY numBooks DESC
+```
+
+1. Which books have been read by a particular user? (Could be sorted by date read)
+
+```cypher
+MATCH (u:User)-[r:READ]->(b:Book)
+WHERE u.name = 'Sebastian'
+RETURN b.title, r.dateRead
+ORDER BY r.dateRead
+```
+
+### Displaying the data
+
 Then we preview the nodes and relationships:
 
 ```cypher
 // Show all nodes and relationships
 MATCH (n) RETURN n;
+
+// Show all constraints
+SHOW ALL CONSTRAINTS;
 
 // Delete all nodes and relationships
 // MATCH (n) DETACH DELETE n;
