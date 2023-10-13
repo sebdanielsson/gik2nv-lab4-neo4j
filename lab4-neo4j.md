@@ -2,11 +2,12 @@
 
 **Course:** Data Storage and Management Technologies (GIK2NV)  
 **Date:** 2023-10-10
+**Repo:** [https://github.com/sebdanielsson/gik2nv-lab4-neo4j](https://github.com/sebdanielsson/gik2nv-lab4-neo4j)
 
 **Authors:**  
-Sebastian Danielsson  
-Veronika Engberg  
-Jesper Andersson
+Sebastian Danielsson (h21sebda)  
+Veronika Engberg (h21veren)  
+Jesper Andersson (h21jespa)
 
 ## A. Description
 
@@ -66,21 +67,20 @@ The graph should be able to be able to provide basic stats for a fictional book 
 
 The number of questions that _can_ be answered by just these four nodes and five relationships is _huge_, so we will list some questions that come to mind and pick a few to answer in the queries.
 
-1. Which books have been read by a particular user? (Could be sorted by date read)
-2. Which books have been written by a particular author? (Could be sorted by publication year, rating)
-3. Which authors are trending? (Could be for a certain time period)
-4. Which books are trending among men and women respectively? (Could be for a certain time period)
-5. Which books are popular among men and women respectively? (Could be for a certain time period)
-6. Which books are trending in a particular genre? (Could be for a certain time period)
-7. Which books are popular in a particular genre? (Could be for a certain time period)
-8. Which books are trending in the users age group? (Could be for a certain time period)
-9. Which books are popular in the users age group? (Could be for a certain time period)
-10. Which books are trending among a user's friends? (Number of friends that have read the book. Could be for a certain time period)
-11. Which books are popular among a user's friends? (Highest mean rating among friends. Could be for a certain time period)
+1. Which books have been read by a particular user? (Ordered by most recently read)
+2. Which books have been written by a particular author? (Could be sorted by publication year, rating, number of readers)
+3. Which books are trending among men and women respectively? (Could be for a certain time period)
+4. Which books are popular among men and women respectively? (Could be for a certain time period)
+5. Which books are trending in a particular genre? (Could be for a certain time period)
+6. Which books are popular in a particular genre? (Could be for a certain time period)
+7. Which books are trending in the users age group? (Could be for a certain time period)
+8. Which books are popular in the users age group? (Could be for a certain time period)
+9. Which books are trending among a user's friends? (Number of friends that have read the book. Could be for a certain time period)
+10. Which books are popular among a user's friends? (Highest mean rating among friends. Could be for a certain time period)
 
 If we can answer these questions, we can also answer much harder questions such as: "Which books will the user most likely want to read next?". By weighting the results of the previous questions we can find the books that are most likely to be liked by the user. The weighting could be based on the user's previous ratings for books in a certain genre or the number of read books written by a particular author, the number of friends that have read the book, the mean rating among friends, etc. Finding the optimal weighting for the different factors is outside the scope of this project, but it is possible to implement a simple recommendation engine based on the graph.
 
-For this project we will try to answer questions 1-11.
+For this project we will try to answer questions 1-10.
 
 ## D. Model
 
@@ -106,11 +106,11 @@ graph TD
 
 We couldn't get the [Neo4j Sandbox](https://neo4j.com/sandbox/) to work so we used the offial Docker image instead. The Docker image is available at [https://hub.docker.com/\_/neo4j](https://hub.docker.com/_/neo4j).
 
-### Creating the labels
-
-First we need to make sure that the label IDs are unique. We do this by creating constraints on the labels.
+### Code
 
 ```cypher
+// --- CONSTRAINTS --- //
+
 // Create unique constraints for id's in each node
 CREATE CONSTRAINT book_id_unique IF NOT EXISTS
 FOR (book:Book) REQUIRE book.bookID IS UNIQUE;
@@ -132,11 +132,9 @@ REQUIRE r.dateRead IS NOT NULL;
 CREATE CONSTRAINT rating_exists IF NOT EXISTS
 FOR ()-[r:READ]-()
 REQUIRE r.rating IS NOT NULL;
-```
 
-We then proceed to create the labels.
+// --- LABELS --- //
 
-```cypher
 // Create Author nodes
 CREATE
        (a1:Author {authorID: 1, name: 'Dame Agatha Christie', gender: 'Female'}),
@@ -163,11 +161,9 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
        (u2:User {userID: 2, name: 'Veronika', birthYear: 1987, gender: 'Female'}),
        (u3:User {userID: 3, name: 'Jesper', birthYear: 1990, gender: 'Male'}),
        (u4:User {userID: 4, name: 'Elon', birthYear: 1971, gender: 'Male'});
-```
 
-### Creating the relationships
+// --- RELATIONSHIPS --- //
 
-```cypher
 // WRITTEN_BY relationships
 MATCH (b1:Book {title: 'Murder on the Orient Express'})
 MATCH (a1:Author {name: 'Dame Agatha Christie'})
@@ -251,27 +247,118 @@ MERGE (u2)-[:FRIENDS_WITH]->(u4);
 MATCH (u3:User {name: 'Jesper'})
 MATCH (u4:User {name: 'Elon'})
 MERGE (u3)-[:FRIENDS_WITH]->(u4);
-```
 
-### Querying the graph
+// --- QUERIES --- //
 
-```cypher
-MATCH (u:User)-[r:READ]->(b:Book)-[s:BELONGS_TO]->(g:Genre)
-WHERE u.userID = 1
-RETURN g.genreName, COUNT(b) AS numBooks
-ORDER BY numBooks DESC
-```
-
-1. Which books have been read by a particular user? (Could be sorted by date read)
-
-```cypher
+// Q1: Books read by Sebastian
 MATCH (u:User)-[r:READ]->(b:Book)
 WHERE u.name = 'Sebastian'
-RETURN b.title, r.dateRead
-ORDER BY r.dateRead
+RETURN b.title, r.dateRead, r.rating
+ORDER BY r.dateRead DESC;
+
+// Q2: Books written by Dame Agatha Christie
+MATCH (b:Book)-[:WRITTEN_BY]->(a:Author)
+WHERE a.name = 'Dame Agatha Christie'
+OPTIONAL MATCH (b)<-[r:READ]-()
+RETURN b.title, b.publicationYear, AVG(r.rating) AS meanRating, COUNT(r) AS readers
+ORDER BY b.publicationYear;
+
+// Q3A: Top 10 trending books with males last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(r) AS maleReaders, 'Male' AS gender
+ORDER BY maleReaders DESC
+LIMIT 10;
+
+// Q3B: Top 10 trending books with females last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(r) AS femaleReaders, 'Female' AS gender
+ORDER BY femaleReaders DESC
+LIMIT 10;
+
+// Q4A: Top 10 top-rated books by males from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgMaleRating, 'Male' AS gender
+ORDER BY avgMaleRating DESC
+LIMIT 10;
+
+// Q4B: Top 10 top-rated books by females from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgFemaleRating, 'Female' AS gender
+ORDER BY avgFemaleRating DESC
+LIMIT 10;
+
+// Q5: Top 10 trending books in the Fantasy genre from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)-[:BELONGS_TO]->(g:Genre), (u:User)-[r:READ]->(b)
+WHERE g.genreName = 'Fantasy' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(r) AS readers
+ORDER BY readers DESC
+LIMIT 10;
+
+// Q6: Top 10 top-rated books in the Fantasy genre from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)-[:BELONGS_TO]->(g:Genre), (u:User)-[r:READ]->(b)
+WHERE g.genreName = 'Fantasy' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgRating
+ORDER BY avgRating DESC
+LIMIT 10;
+
+// Q7: Top 10 trending books among millennials from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[r:READ]->(b:Book)
+WHERE date(r.dateRead) >= lastMonthDate
+  AND u.birthYear >= 1981 AND u.birthYear <= 1996
+
+RETURN b.title, count(r) AS reads
+ORDER BY reads DESC
+LIMIT 10;
+
+// Q8: Top 10 top-rated books among millennials from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[r:READ]->(b:Book)
+WHERE date(r.dateRead) >= lastMonthDate
+  AND u.birthYear >= 1981 AND u.birthYear <= 1996
+
+RETURN b.title, AVG(r.rating) AS avgRating
+ORDER BY avgRating DESC
+LIMIT 10;
+
+// Q9: Top 10 trending books among a user's friends from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[:FRIENDS_WITH]->(f:User)-[r:READ]->(b:Book)
+WHERE u.name = 'Sebastian' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(f) AS friendsReads
+ORDER BY friendsReads DESC
+LIMIT 10;
+
+// Q10: Top 10 top-rated books among a user's friends from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[:FRIENDS_WITH]->(f:User)-[r:READ]->(b:Book)
+WHERE u.name = 'Sebastian' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgRating
+ORDER BY avgRating DESC
+LIMIT 10;
 ```
 
-### Displaying the data
+### General queries
 
 Then we preview the nodes and relationships:
 

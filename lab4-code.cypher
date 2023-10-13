@@ -1,3 +1,5 @@
+// --- CONSTRAINTS --- //
+
 // Create unique constraints for id's in each node
 CREATE CONSTRAINT book_id_unique IF NOT EXISTS
 FOR (book:Book) REQUIRE book.bookID IS UNIQUE;
@@ -19,6 +21,8 @@ REQUIRE r.dateRead IS NOT NULL;
 CREATE CONSTRAINT rating_exists IF NOT EXISTS
 FOR ()-[r:READ]-()
 REQUIRE r.rating IS NOT NULL;
+
+// --- LABELS --- //
 
 // Create Author nodes
 CREATE
@@ -46,6 +50,8 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
        (u2:User {userID: 2, name: 'Veronika', birthYear: 1987, gender: 'Female'}),
        (u3:User {userID: 3, name: 'Jesper', birthYear: 1990, gender: 'Male'}),
        (u4:User {userID: 4, name: 'Elon', birthYear: 1971, gender: 'Male'});
+
+// --- RELATIONSHIPS --- //
 
 // WRITTEN_BY relationships
 MATCH (b1:Book {title: 'Murder on the Orient Express'})
@@ -131,11 +137,111 @@ MATCH (u3:User {name: 'Jesper'})
 MATCH (u4:User {name: 'Elon'})
 MERGE (u3)-[:FRIENDS_WITH]->(u4);
 
-// Show all nodes and relationships
-MATCH (n) RETURN n;
+// --- QUERIES --- //
 
-// Show all constraints
-SHOW ALL CONSTRAINTS;
+// Q1: Books read by Sebastian
+MATCH (u:User)-[r:READ]->(b:Book)
+WHERE u.name = 'Sebastian'
+RETURN b.title, r.dateRead, r.rating
+ORDER BY r.dateRead DESC;
 
-// Delete all nodes and relationships
-// MATCH (n) DETACH DELETE n;
+// Q2: Books written by Dame Agatha Christie
+MATCH (b:Book)-[:WRITTEN_BY]->(a:Author)
+WHERE a.name = 'Dame Agatha Christie'
+OPTIONAL MATCH (b)<-[r:READ]-()
+RETURN b.title, b.publicationYear, AVG(r.rating) AS meanRating, COUNT(r) AS readers
+ORDER BY b.publicationYear;
+
+// Q3A: Top 10 trending books with males last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(r) AS maleReaders, 'Male' AS gender
+ORDER BY maleReaders DESC
+LIMIT 10;
+
+// Q3B: Top 10 trending books with females last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(r) AS femaleReaders, 'Female' AS gender
+ORDER BY femaleReaders DESC
+LIMIT 10;
+
+// Q4A: Top 10 top-rated books by males from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgMaleRating, 'Male' AS gender
+ORDER BY avgMaleRating DESC
+LIMIT 10;
+
+// Q4B: Top 10 top-rated books by females from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)<-[r:READ]-(u:User)
+WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgFemaleRating, 'Female' AS gender
+ORDER BY avgFemaleRating DESC
+LIMIT 10;
+
+// Q5: Top 10 trending books in the Fantasy genre from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)-[:BELONGS_TO]->(g:Genre), (u:User)-[r:READ]->(b)
+WHERE g.genreName = 'Fantasy' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(r) AS readers
+ORDER BY readers DESC
+LIMIT 10;
+
+// Q6: Top 10 top-rated books in the Fantasy genre from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (b:Book)-[:BELONGS_TO]->(g:Genre), (u:User)-[r:READ]->(b)
+WHERE g.genreName = 'Fantasy' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgRating
+ORDER BY avgRating DESC
+LIMIT 10;
+
+// Q7: Top 10 trending books among millennials from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[r:READ]->(b:Book)
+WHERE date(r.dateRead) >= lastMonthDate
+  AND u.birthYear >= 1981 AND u.birthYear <= 1996
+
+RETURN b.title, count(r) AS reads
+ORDER BY reads DESC
+LIMIT 10;
+
+// Q8: Top 10 top-rated books among millennials from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[r:READ]->(b:Book)
+WHERE date(r.dateRead) >= lastMonthDate
+  AND u.birthYear >= 1981 AND u.birthYear <= 1996
+
+RETURN b.title, AVG(r.rating) AS avgRating
+ORDER BY avgRating DESC
+LIMIT 10;
+
+// Q9: Top 10 trending books among a user's friends from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[:FRIENDS_WITH]->(f:User)-[r:READ]->(b:Book)
+WHERE u.name = 'Sebastian' AND r.dateRead >= lastMonthDate
+RETURN b.title, COUNT(f) AS friendsReads
+ORDER BY friendsReads DESC
+LIMIT 10;
+
+// Q10: Top 10 top-rated books among a user's friends from the last month
+WITH date() - duration('P1M') AS lastMonthDate
+
+MATCH (u:User)-[:FRIENDS_WITH]->(f:User)-[r:READ]->(b:Book)
+WHERE u.name = 'Sebastian' AND r.dateRead >= lastMonthDate
+RETURN b.title, AVG(r.rating) AS avgRating
+ORDER BY avgRating DESC
+LIMIT 10;
