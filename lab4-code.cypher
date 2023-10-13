@@ -157,7 +157,7 @@ WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
-RETURN b.title, COUNT(r) AS maleReaders, 'Male' AS gender
+RETURN b.title, COUNT(r) AS maleReaders
 ORDER BY maleReaders DESC
 LIMIT 10;
 
@@ -166,7 +166,7 @@ WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
-RETURN b.title, COUNT(r) AS femaleReaders, 'Female' AS gender
+RETURN b.title, COUNT(r) AS femaleReaders
 ORDER BY femaleReaders DESC
 LIMIT 10;
 
@@ -175,7 +175,7 @@ WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
-RETURN b.title, AVG(r.rating) AS avgMaleRating, 'Male' AS gender
+RETURN b.title, AVG(r.rating) AS avgMaleRating
 ORDER BY avgMaleRating DESC
 LIMIT 10;
 
@@ -184,7 +184,7 @@ WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
-RETURN b.title, AVG(r.rating) AS avgFemaleRating, 'Female' AS gender
+RETURN b.title, AVG(r.rating) AS avgFemaleRating
 ORDER BY avgFemaleRating DESC
 LIMIT 10;
 

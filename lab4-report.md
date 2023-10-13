@@ -106,7 +106,7 @@ graph TD
 
 We couldn't get the [Neo4j Sandbox](https://neo4j.com/sandbox/) to work so we used the offial Docker image instead. The Docker image is available at [https://hub.docker.com/\_/neo4j](https://hub.docker.com/_/neo4j).
 
-### Code
+### Code for creating the graph
 
 ```cypher
 // --- CONSTRAINTS --- //
@@ -132,7 +132,11 @@ REQUIRE r.dateRead IS NOT NULL;
 CREATE CONSTRAINT rating_exists IF NOT EXISTS
 FOR ()-[r:READ]-()
 REQUIRE r.rating IS NOT NULL;
+```
 
+![Constraints](img/constraints.png)
+
+```cypher
 // --- LABELS --- //
 
 // Create Author nodes
@@ -161,7 +165,12 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
        (u2:User {userID: 2, name: 'Veronika', birthYear: 1987, gender: 'Female'}),
        (u3:User {userID: 3, name: 'Jesper', birthYear: 1990, gender: 'Male'}),
        (u4:User {userID: 4, name: 'Elon', birthYear: 1971, gender: 'Male'});
+```
 
+![Labels code](img/labels.png)
+![Nodes](img/nodes_added.png)
+
+```cypher
 // --- RELATIONSHIPS --- //
 
 // WRITTEN_BY relationships
@@ -247,58 +256,87 @@ MERGE (u2)-[:FRIENDS_WITH]->(u4);
 MATCH (u3:User {name: 'Jesper'})
 MATCH (u4:User {name: 'Elon'})
 MERGE (u3)-[:FRIENDS_WITH]->(u4);
+```
 
-// --- QUERIES --- //
+![Relationships code](relationships.png)
+![Relationships](img/relationships_added.png)
 
+### Code for querying the graph
+
+```cypher
 // Q1: Books read by Sebastian
 MATCH (u:User)-[r:READ]->(b:Book)
 WHERE u.name = 'Sebastian'
 RETURN b.title, r.dateRead, r.rating
 ORDER BY r.dateRead DESC;
+```
 
+![Query 1](img/query_1.png)
+
+```cypher
 // Q2: Books written by Dame Agatha Christie
 MATCH (b:Book)-[:WRITTEN_BY]->(a:Author)
 WHERE a.name = 'Dame Agatha Christie'
 OPTIONAL MATCH (b)<-[r:READ]-()
 RETURN b.title, b.publicationYear, AVG(r.rating) AS meanRating, COUNT(r) AS readers
 ORDER BY b.publicationYear;
+```
 
+![Query 2](img/query_2.png)
+
+```cypher
 // Q3A: Top 10 trending books with males last month
 WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
-RETURN b.title, COUNT(r) AS maleReaders, 'Male' AS gender
+RETURN b.title, COUNT(r) AS maleReaders
 ORDER BY maleReaders DESC
 LIMIT 10;
+```
 
+![Query 3A](img/query_3a.png)
+
+```cypher
 // Q3B: Top 10 trending books with females last month
 WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
-RETURN b.title, COUNT(r) AS femaleReaders, 'Female' AS gender
+RETURN b.title, COUNT(r) AS femaleReaders
 ORDER BY femaleReaders DESC
 LIMIT 10;
+```
 
+![Query 3B](img/query_3b.png)
+
+```cypher
 // Q4A: Top 10 top-rated books by males from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Male' AND r.dateRead >= lastMonthDate
-RETURN b.title, AVG(r.rating) AS avgMaleRating, 'Male' AS gender
+RETURN b.title, AVG(r.rating) AS avgMaleRating
 ORDER BY avgMaleRating DESC
 LIMIT 10;
+```
 
+![Query 4A](img/query_4a.png)
+
+```cypher
 // Q4B: Top 10 top-rated books by females from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
 MATCH (b:Book)<-[r:READ]-(u:User)
 WHERE u.gender = 'Female' AND r.dateRead >= lastMonthDate
-RETURN b.title, AVG(r.rating) AS avgFemaleRating, 'Female' AS gender
+RETURN b.title, AVG(r.rating) AS avgFemaleRating
 ORDER BY avgFemaleRating DESC
 LIMIT 10;
+```
 
+![Query 4B](img/query_4b.png)
+
+```cypher
 // Q5: Top 10 trending books in the Fantasy genre from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
@@ -307,7 +345,11 @@ WHERE g.genreName = 'Fantasy' AND r.dateRead >= lastMonthDate
 RETURN b.title, COUNT(r) AS readers
 ORDER BY readers DESC
 LIMIT 10;
+```
 
+![Query 5](img/query_5.png)
+
+```cypher
 // Q6: Top 10 top-rated books in the Fantasy genre from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
@@ -316,7 +358,11 @@ WHERE g.genreName = 'Fantasy' AND r.dateRead >= lastMonthDate
 RETURN b.title, AVG(r.rating) AS avgRating
 ORDER BY avgRating DESC
 LIMIT 10;
+```
 
+![Query 6](img/query_6.png)
+
+```cypher
 // Q7: Top 10 trending books among millennials from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
@@ -327,7 +373,11 @@ WHERE date(r.dateRead) >= lastMonthDate
 RETURN b.title, count(r) AS reads
 ORDER BY reads DESC
 LIMIT 10;
+```
 
+![Query 7](img/query_7.png)
+
+```cypher
 // Q8: Top 10 top-rated books among millennials from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
@@ -338,7 +388,11 @@ WHERE date(r.dateRead) >= lastMonthDate
 RETURN b.title, AVG(r.rating) AS avgRating
 ORDER BY avgRating DESC
 LIMIT 10;
+```
 
+![Query 8](img/query_8.png)
+
+```cypher
 // Q9: Top 10 trending books among a user's friends from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
@@ -347,7 +401,11 @@ WHERE u.name = 'Sebastian' AND r.dateRead >= lastMonthDate
 RETURN b.title, COUNT(f) AS friendsReads
 ORDER BY friendsReads DESC
 LIMIT 10;
+```
 
+![Query 9](img/query_9.png)
+
+```cypher
 // Q10: Top 10 top-rated books among a user's friends from the last month
 WITH date() - duration('P1M') AS lastMonthDate
 
@@ -357,6 +415,8 @@ RETURN b.title, AVG(r.rating) AS avgRating
 ORDER BY avgRating DESC
 LIMIT 10;
 ```
+
+![Query 10](img/query_10.png)
 
 ### General queries
 
