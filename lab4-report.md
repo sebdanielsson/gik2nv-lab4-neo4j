@@ -150,7 +150,8 @@ REQUIRE r.rating IS NOT NULL;
 ```
 
 ![Labels code](img/labels.png)
-![Nodes](img/nodes_added.png)
+
+<img src="img/nodes_added.png" alt="Nodes" width="50%">
 
 ```cypher
 // --- LABELS --- //
@@ -184,7 +185,8 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
 ```
 
 ![Relationships code](img/relationships.png)
-![Relationships](img/relationships_added.png)
+
+<img src="img/relationships_added.png" alt="Relationships" width="50%">
 
 ```cypher
 // --- RELATIONSHIPS --- //
