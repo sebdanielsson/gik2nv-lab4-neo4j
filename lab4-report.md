@@ -108,6 +108,8 @@ We couldn't get the [Neo4j Sandbox](https://neo4j.com/sandbox/) to work so we us
 
 ### Code for creating the graph
 
+![Constraints](img/constraints.png)
+
 ```cypher
 // --- CONSTRAINTS --- //
 
@@ -134,7 +136,8 @@ FOR ()-[r:READ]-()
 REQUIRE r.rating IS NOT NULL;
 ```
 
-![Constraints](img/constraints.png)
+![Labels code](img/labels.png)
+![Nodes](img/nodes_added.png)
 
 ```cypher
 // --- LABELS --- //
@@ -167,8 +170,8 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
        (u4:User {userID: 4, name: 'Elon', birthYear: 1971, gender: 'Male'});
 ```
 
-![Labels code](img/labels.png)
-![Nodes](img/nodes_added.png)
+![Relationships code](relationships.png)
+![Relationships](img/relationships_added.png)
 
 ```cypher
 // --- RELATIONSHIPS --- //
@@ -257,9 +260,6 @@ MATCH (u3:User {name: 'Jesper'})
 MATCH (u4:User {name: 'Elon'})
 MERGE (u3)-[:FRIENDS_WITH]->(u4);
 ```
-
-![Relationships code](relationships.png)
-![Relationships](img/relationships_added.png)
 
 ### Code for querying the graph
 
