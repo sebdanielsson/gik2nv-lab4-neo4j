@@ -9,6 +9,19 @@ Sebastian Danielsson (h21sebda)
 Veronika Engberg (h21veren)  
 Jesper Andersson (h21jespa)
 
+## Table of Contents
+
+- [Lab 4 - Neo4j](#lab-4---neo4j)
+  - [Table of Contents](#table-of-contents)
+  - [A. Description](#a-description)
+  - [B. Nodes and Relationships](#b-nodes-and-relationships)
+  - [C. Questions](#c-questions)
+  - [D. Model](#d-model)
+  - [E. Implementation](#e-implementation)
+    - [Code for creating the graph](#code-for-creating-the-graph)
+    - [Code for querying the graph](#code-for-querying-the-graph)
+    - [General queries](#general-queries)
+
 ## A. Description
 
 This project will build a simple book recommendation model with Neo4j. The graph will contain books, authors, users, and genres. The graph will be queried to find book recommendations for a user. The recommendations will be based on the books that the user has previously read in terms of genre and author, as well as their friends' previously read books and the ratings they gave them.
