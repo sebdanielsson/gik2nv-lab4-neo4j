@@ -1,7 +1,7 @@
 # Lab 4 - Neo4j
 
 **Course:** Data Storage and Management Technologies (GIK2NV)  
-**Date:** 2023-10-10
+**Date:** 2023-10-10  
 **Repo:** [https://github.com/sebdanielsson/gik2nv-lab4-neo4j](https://github.com/sebdanielsson/gik2nv-lab4-neo4j)
 
 **Authors:**  
