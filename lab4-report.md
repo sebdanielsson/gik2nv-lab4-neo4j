@@ -183,7 +183,7 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
        (u4:User {userID: 4, name: 'Elon', birthYear: 1971, gender: 'Male'});
 ```
 
-![Relationships code](relationships.png)
+![Relationships code](img/relationships.png)
 ![Relationships](img/relationships_added.png)
 
 ```cypher
