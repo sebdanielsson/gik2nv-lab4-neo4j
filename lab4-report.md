@@ -117,7 +117,40 @@ graph TD
 
 ## E. Implementation
 
-We couldn't get the [Neo4j Sandbox](https://neo4j.com/sandbox/) to work so we used the official Docker image instead. The Docker image is available at [https://hub.docker.com/\_/neo4j](https://hub.docker.com/_/neo4j).
+### Environment
+
+We couldn't get the [Neo4j Sandbox](https://neo4j.com/sandbox/) to work so we used the official Docker image instead. The Docker image is available at [Docker Hub](https://hub.docker.com/_/neo4j). Basic steps for recreating the environment are outlined below.
+
+Create a `compose.yaml` file in an empty directory:
+
+```yaml
+---
+services:
+  neo4j:
+    container_name: neo4j-lab4
+    image: neo4j:5.12.0-enterprise
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: none
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: yes
+    volumes:
+      - ./neo4j/data:/data:rw
+      - ./neo4j/logs:/logs:rw
+      - ./neo4j/conf:/conf:rw
+      - ./neo4j/plugins:/plugins:rw
+      - ./neo4j/import:/import:ro
+    restart: unless-stopped
+```
+
+While in the same directory as the compose file, run:
+
+```sh
+docker compose up -d
+```
+
+Neo4j should be up and running with persistent storage. A directory named neo4j should now appear in your workdir containing the application files.
 
 ### Code for creating the graph
 
