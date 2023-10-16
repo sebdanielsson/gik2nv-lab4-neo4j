@@ -35,7 +35,7 @@ The graph will contain four nodes. These nodes were chosen because they are dist
 The first label is **_Book_**, representing nodes containing information about individual books. Nodes with this label will have properties such as `bookID`, `title`, and `publicationYear`.  
 The second label is **_Genre_**, representing nodes containing information about a specific genre. Nodes with this label will have properties such as `genreID`, and `genreName`.  
 The third label is **_Author_**, representing nodes containing information about a specific author. Nodes with this label will have properties such as `authorID`, `name`, and `gender`.  
-The fourth label is **_User_**, representing nodes containing infornation about specific a specific user. Nodes with this label will have properties such as `userID`, `name`, `birthYear`, and `gender`.
+The fourth label is **_User_**, representing nodes containing information about a specific user. Nodes with this label will have properties such as `userID`, `name`, `birthYear`, and `gender`.
 
 - **Label:** Book  
   **Properties:** bookID, title, publicationYear
@@ -76,7 +76,7 @@ The fourth relationship is **_BELONGS_TO_**, representing the relationship betwe
 
 ## C. Questions
 
-The graph should be able to be able to provide basic stats for a fictional book reading community, as well as offer book recommendations for users. The recommendations will be based on the books that the user has previously read in terms of genre and author. The recommendation engine should also be able to provide recommendations based on friends' previously read books, the ratings they gave them and how many friends have read the book.
+The graph should be able to provide basic stats for a fictional book reading community, as well as offer book recommendations for users. The recommendations will be based on the books that the user has previously read in terms of genre and author. The recommendation engine should also be able to provide recommendations based on friends' previously read books, the ratings they gave them and how many friends have read the book.
 
 The number of questions that _can_ be answered by just these four nodes and five relationships is _huge_, so we will list some questions that come to mind and pick a few to answer in the queries.
 
@@ -105,7 +105,7 @@ graph TD
     %% Nodes
     User[User<br>userID, name, birthYear, gender]
     Book[Book<br>bookID, title, publicationYear]
-    Author[Author<br>authorID, name, gender]
+    Author[Author<br>authorID, name]
     Genre[Genre<br>genreID, genreName]
 
     %% Relationships
@@ -117,7 +117,7 @@ graph TD
 
 ## E. Implementation
 
-We couldn't get the [Neo4j Sandbox](https://neo4j.com/sandbox/) to work so we used the offial Docker image instead. The Docker image is available at [https://hub.docker.com/\_/neo4j](https://hub.docker.com/_/neo4j).
+We couldn't get the [Neo4j Sandbox](https://neo4j.com/sandbox/) to work so we used the official Docker image instead. The Docker image is available at [https://hub.docker.com/\_/neo4j](https://hub.docker.com/_/neo4j).
 
 ### Code for creating the graph
 
