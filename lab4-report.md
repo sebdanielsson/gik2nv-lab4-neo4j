@@ -191,10 +191,10 @@ REQUIRE r.rating IS NOT NULL;
 
 // Create Author nodes
 CREATE
-       (a1:Author {authorID: 1, name: 'Dame Agatha Christie', gender: 'Female'}),
-       (a2:Author {authorID: 2, name: 'George Orwell', gender: 'Male'}),
-       (a3:Author {authorID: 3, name: 'J. K. Rowling', gender: 'Female'}),
-       (a4:Author {authorID: 4, name: 'F. Scott Fitzgerald', gender: 'Male'});
+       (a1:Author {authorID: 1, name: 'Dame Agatha Christie'}),
+       (a2:Author {authorID: 2, name: 'George Orwell'}),
+       (a3:Author {authorID: 3, name: 'J. K. Rowling'}),
+       (a4:Author {authorID: 4, name: 'F. Scott Fitzgerald'});
 
 // Create Book nodes
 CREATE
