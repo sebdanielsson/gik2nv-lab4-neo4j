@@ -51,7 +51,7 @@ The fourth label is **_User_**, representing nodes containing information about 
 
 ---
 
-The graph will contain five relationships. These relationships were chosen because they are the relationships that exist between the nodes.
+The graph will contain four relationships. These relationships were chosen because they are the relationships that exist between the nodes.
 
 The first relationship is **_READ_**, representing the relationship between a user and a book that the user has read. This relationship will have properties such as `rating` and `dateRead`.  
 The second relationship is **_FRIENDS_WITH_**, representing the relationship between two users that are friends. This relationship will not have any properties.  
@@ -172,7 +172,7 @@ FOR (genre:Genre) REQUIRE genre.genreID IS UNIQUE;
 CREATE CONSTRAINT user_id_unique IF NOT EXISTS
 FOR (user:User) REQUIRE user.userID IS UNIQUE;
 
-// Require a rating and date for finish reading the book. (Requires enterprise edition)
+// Require a rating and date for READ relation. (Requires enterprise edition)
 CREATE CONSTRAINT read_date_exists IF NOT EXISTS
 FOR ()-[r:READ]-()
 REQUIRE r.dateRead IS NOT NULL;
