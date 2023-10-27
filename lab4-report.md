@@ -224,6 +224,8 @@ CREATE (u1:User {userID: 1, name: 'Sebastian', birthYear: 1994, gender: 'Male'})
 ```cypher
 // --- RELATIONSHIPS --- //
 
+// Use MATCH and MERGE to prevent duplicates
+
 // WRITTEN_BY relationships
 MATCH (b1:Book {title: 'Murder on the Orient Express'})
 MATCH (a1:Author {name: 'Dame Agatha Christie'})
