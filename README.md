@@ -1,5 +1,9 @@
 # GIK2NV - Lab 4 - Neo4j
 
+## Lab Report
+
+[Lab Report](lab4-report.md)
+
 ## Setup the environnement
 
 ### Prerequisites
