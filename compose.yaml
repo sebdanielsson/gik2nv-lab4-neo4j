@@ -2,7 +2,7 @@
 services:
   neo4j:
     container_name: neo4j-lab4
-    image: neo4j:5.26.1-enterprise
+    image: neo4j:5.26.2-enterprise
     ports:
       - "7474:7474"
       - "7687:7687"
